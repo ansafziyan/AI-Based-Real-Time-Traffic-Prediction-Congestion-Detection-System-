@@ -1,11 +1,12 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 import numpy as np
 
 app = FastAPI()
 
 @app.get("/")
 def home():
-    return {"message": "AI Backend Running"}
+    return FileResponse("index.html")
 
 @app.post("/predict")
 def predict(data: dict):
