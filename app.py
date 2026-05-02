@@ -11,5 +11,8 @@ def home():
 @app.post("/predict")
 def predict(data: dict):
     x = np.array(data["input"], dtype=float)
-    prediction = float(np.mean(x) * 10)
-    return {"prediction": round(prediction, 2)}
+    
+    # Simulated intelligent scoring (0–100 scale)
+    score = float(np.mean(x) * 10)
+    
+    return {"prediction": round(score, 2)}
