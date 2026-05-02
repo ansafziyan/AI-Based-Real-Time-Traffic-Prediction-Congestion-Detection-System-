@@ -6,57 +6,64 @@
   <style>
     body {
       font-family: Arial;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
+      background: radial-gradient(circle at top, #0a0a0a, #000000);
       color: white;
       text-align: center;
       padding: 30px;
     }
 
     .container {
-      background: #1e293b;
+      background: rgba(20, 20, 20, 0.9);
+      backdrop-filter: blur(10px);
       padding: 30px;
-      border-radius: 15px;
-      width: 85%;
+      border-radius: 20px;
+      width: 500px;
       margin: auto;
-      box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+      box-shadow: 0px 0px 40px rgba(0, 255, 150, 0.2);
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-top: 20px;
+    h1 {
+      margin-bottom: 10px;
+      color: #22c55e;
     }
 
     input {
-      padding: 10px;
-      border-radius: 8px;
+      padding: 12px;
+      margin: 10px;
+      border-radius: 10px;
       border: none;
-      width: 90%;
+      width: 80%;
+      background: #111;
+      color: white;
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
     }
 
-    label {
-      font-size: 14px;
+    input:focus {
+      box-shadow: 0 0 10px #22c55e;
     }
 
     button {
-      margin-top: 20px;
       padding: 12px 25px;
-      background: #22c55e;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       color: white;
       font-size: 16px;
       cursor: pointer;
+      margin-top: 15px;
+      box-shadow: 0 0 15px rgba(34,197,94,0.5);
     }
 
     button:hover {
-      background: #16a34a;
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(34,197,94,0.8);
     }
 
     #result {
-      margin-top: 20px;
+      margin-top: 25px;
       font-size: 22px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -64,10 +71,17 @@
 <body>
 
 <div class="container">
-  <h1>🚦 Smart Traffic Prediction System</h1>
-  <p>Enter real-world traffic parameters (0–10 ratings where applicable)</p>
+  <h1>🚦 Smart Traffic Prediction</h1>
+  <p style="color:#aaa;">AI-powered traffic analysis system</p>
 
-  <div class="grid" id="inputs"></div>
+  <input type="number" id="i0" placeholder="Vehicle Count (0-200)">
+  <input type="number" id="i1" placeholder="Average Speed (0-100 km/h)">
+  <input type="number" id="i2" placeholder="Signal Delay (0-180 sec)">
+  <input type="number" id="i3" placeholder="Road Width (3-20 m)">
+  <input type="number" id="i4" placeholder="Time of Day (0-24)">
+  <input type="number" id="i5" placeholder="Road Condition (0-10)">
+  <input type="number" id="i6" placeholder="Traffic Density (0-10)">
+  <input type="number" id="i7" placeholder="Accident Severity (0-10)">
 
   <button onclick="predict()">Predict Traffic</button>
 
@@ -75,37 +89,10 @@
 </div>
 
 <script>
-const labels = [
-"Vehicle Count",
-"Average Speed (km/h)",
-"Road Width (m)",
-"Signal Delay (sec)",
-"Pedestrian Count",
-"Time of Day (0-24)",
-"Lane Count",
-"Accident Severity (0-10)",
-"Traffic Density (0-10, 10 = very crowded)",
-"Public Transport Load (0-10)",
-"Road Condition (0-10, 10 = excellent)",
-"Driver Behavior (0-10)",
-"Congestion History (0-10)"
-];
-
-const inputDiv = document.getElementById("inputs");
-
-labels.forEach((label, i) => {
-  inputDiv.innerHTML += `
-    <div>
-      <label>${label}</label><br>
-      <input type="number" id="i${i}" placeholder="${label}">
-    </div>
-  `;
-});
-
 async function predict() {
   let values = [];
 
-  for (let i = 0; i < 13; i++) {
+  for (let i = 0; i < 8; i++) {
     values.push(parseFloat(document.getElementById("i"+i).value) || 0);
   }
 
@@ -123,24 +110,21 @@ async function predict() {
   if (data.prediction < 25) {
     status = "🟢 Low Traffic";
     color = "#22c55e";
-  } 
-  else if (data.prediction < 50) {
+  } else if (data.prediction < 50) {
     status = "🟡 Moderate Traffic";
     color = "#eab308";
-  } 
-  else if (data.prediction < 75) {
+  } else if (data.prediction < 75) {
     status = "🟠 High Traffic";
     color = "#f97316";
-  } 
-  else {
+  } else {
     status = "🔴 Very High Traffic";
     color = "#ef4444";
   }
 
   document.getElementById("result").innerHTML =
     `<span style="color:${color}">
-      Traffic Score: ${data.prediction} / 100 <br>
-      Level: ${status}
+      Traffic Score: ${data.prediction}/100 <br>
+      ${status}
     </span>`;
 }
 </script>
