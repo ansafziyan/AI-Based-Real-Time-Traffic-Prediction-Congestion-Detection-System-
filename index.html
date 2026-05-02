@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Traffic Prediction</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 50px;
+    }
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 80px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      padding: 10px 20px;
+      background: #22c55e;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #16a34a;
+    }
+    .box {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h1>🚦 AI Traffic Prediction</h1>
+    <p>Enter 13 values:</p>
+
+    <div id="inputs"></div>
+
+    <br>
+    <button onclick="predict()">Predict</button>
+
+    <h2 id="result"></h2>
+  </div>
+
+  <script>
+    const inputDiv = document.getElementById("inputs");
+
+    for (let i = 0; i < 13; i++) {
+      inputDiv.innerHTML += `<input type="number" id="i${i}" placeholder="X${i+1}">`;
+    }
+
+    async function predict() {
+      let values = [];
+      for (let i = 0; i < 13; i++) {
+        values.push(parseFloat(document.getElementById("i"+i).value));
+      }
+
+      const res = await fetch("/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({input: values})
+      });
+
+      const data = await res.json();
+      document.getElementById("result").innerText =
+        "Prediction: " + data.prediction;
+    }
+  </script>
+</body>
+</html>
