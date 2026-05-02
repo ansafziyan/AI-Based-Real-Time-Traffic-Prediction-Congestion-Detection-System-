@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 import numpy as np
-import tensorflow as tf
 
 app = FastAPI()
 
-# ✅ Load locally trained model
-model = tf.keras.models.load_model("model.h5")
+def predict_model(x):
+    return float(np.mean(x) * 10)
 
 @app.get("/")
 def home():
@@ -13,6 +12,6 @@ def home():
 
 @app.post("/predict")
 def predict(data: dict):
-    x = np.array(data["input"], dtype=float).reshape(1, -1)
-    prediction = model.predict(x).tolist()
+    x = np.array(data["input"], dtype=float)
+    prediction = predict_model(x)
     return {"prediction": prediction}
