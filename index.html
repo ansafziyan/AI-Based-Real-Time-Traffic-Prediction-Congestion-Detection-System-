@@ -14,17 +14,11 @@
 
     .container {
       background: rgba(20, 20, 20, 0.9);
-      backdrop-filter: blur(10px);
       padding: 30px;
       border-radius: 20px;
       width: 500px;
       margin: auto;
       box-shadow: 0px 0px 40px rgba(0, 255, 150, 0.2);
-    }
-
-    h1 {
-      margin-bottom: 10px;
-      color: #22c55e;
     }
 
     input {
@@ -35,12 +29,6 @@
       width: 80%;
       background: #111;
       color: white;
-      outline: none;
-      box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
-    }
-
-    input:focus {
-      box-shadow: 0 0 10px #22c55e;
     }
 
     button {
@@ -49,21 +37,16 @@
       border: none;
       border-radius: 10px;
       color: white;
-      font-size: 16px;
       cursor: pointer;
-      margin-top: 15px;
-      box-shadow: 0 0 15px rgba(34,197,94,0.5);
     }
 
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px rgba(34,197,94,0.8);
+    canvas {
+      margin-top: 20px;
     }
 
     #result {
-      margin-top: 25px;
-      font-size: 22px;
-      font-weight: bold;
+      margin-top: 15px;
+      font-size: 20px;
     }
   </style>
 </head>
@@ -72,23 +55,68 @@
 
 <div class="container">
   <h1>🚦 Smart Traffic Prediction</h1>
-  <p style="color:#aaa;">AI-powered traffic analysis system</p>
 
   <input type="number" id="i0" placeholder="Vehicle Count (0-200)">
-  <input type="number" id="i1" placeholder="Average Speed (0-100 km/h)">
-  <input type="number" id="i2" placeholder="Signal Delay (0-180 sec)">
-  <input type="number" id="i3" placeholder="Road Width (3-20 m)">
+  <input type="number" id="i1" placeholder="Average Speed (0-100)">
+  <input type="number" id="i2" placeholder="Signal Delay (0-180)">
+  <input type="number" id="i3" placeholder="Road Width (3-20)">
   <input type="number" id="i4" placeholder="Time of Day (0-24)">
   <input type="number" id="i5" placeholder="Road Condition (0-10)">
   <input type="number" id="i6" placeholder="Traffic Density (0-10)">
   <input type="number" id="i7" placeholder="Accident Severity (0-10)">
 
-  <button onclick="predict()">Predict Traffic</button>
+  <button onclick="predict()">Predict</button>
+
+  <canvas id="gauge" width="300" height="150"></canvas>
 
   <div id="result"></div>
 </div>
 
 <script>
+const canvas = document.getElementById("gauge");
+const ctx = canvas.getContext("2d");
+
+function drawGauge(value) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let centerX = 150;
+  let centerY = 140;
+  let radius = 100;
+
+  // Background arc
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, Math.PI, 0);
+  ctx.strokeStyle = "#333";
+  ctx.lineWidth = 15;
+  ctx.stroke();
+
+  // Color zones
+  const colors = ["#22c55e", "#eab308", "#f97316", "#ef4444"];
+  const stops = [0.25, 0.5, 0.75, 1];
+
+  let start = Math.PI;
+  stops.forEach((stop, i) => {
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, start, Math.PI + stop*Math.PI);
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 15;
+    ctx.stroke();
+    start = Math.PI + stop*Math.PI;
+  });
+
+  // Needle
+  let angle = Math.PI + (value/100)*Math.PI;
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY);
+  ctx.lineTo(
+    centerX + radius*Math.cos(angle),
+    centerY + radius*Math.sin(angle)
+  );
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
 async function predict() {
   let values = [];
 
@@ -104,26 +132,28 @@ async function predict() {
 
   const data = await res.json();
 
+  drawGauge(data.prediction);
+
   let status = "";
   let color = "";
 
   if (data.prediction < 25) {
-    status = "🟢 Low Traffic";
+    status = "Low Traffic";
     color = "#22c55e";
   } else if (data.prediction < 50) {
-    status = "🟡 Moderate Traffic";
+    status = "Moderate Traffic";
     color = "#eab308";
   } else if (data.prediction < 75) {
-    status = "🟠 High Traffic";
+    status = "High Traffic";
     color = "#f97316";
   } else {
-    status = "🔴 Very High Traffic";
+    status = "Very High Traffic";
     color = "#ef4444";
   }
 
   document.getElementById("result").innerHTML =
     `<span style="color:${color}">
-      Traffic Score: ${data.prediction}/100 <br>
+      Score: ${data.prediction}/100 <br>
       ${status}
     </span>`;
 }
