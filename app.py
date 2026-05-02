@@ -12,4 +12,4 @@ def home():
 def predict(data: dict):
     x = np.array(data["input"], dtype=float)
     prediction = float(np.mean(x) * 10)
-    return {"prediction": prediction}
+    return {"prediction": round(prediction, 2)}
