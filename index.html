@@ -1,28 +1,131 @@
-<script>
-const labels = [
-"Vehicle Count",
-"Average Speed (km/h)",
-"Road Width (m)",
-"Signal Timing (sec)",
-"Pedestrian Count",
-"Weather Condition (0-1)",
-"Time of Day (0-24)",
-"Lane Count",
-"Accident (0/1)",
-"Traffic Density",
-"Public Transport",
-"Road Condition (0-1)",
-"Event Impact"
-];
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Traffic Prediction</title>
 
-const inputDiv = document.getElementById("inputs");
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
 
-labels.forEach((label, i) => {
-  inputDiv.innerHTML += `
-    <div>
-      <label>${label}</label><br>
-      <input type="number" id="i${i}" placeholder="${label}">
-    </div><br>
-  `;
-});
-</script>
+    .container {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 15px;
+      width: 80%;
+      margin: auto;
+      box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      width: 90%;
+    }
+
+    label {
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #22c55e;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #16a34a;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 22px;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>🚦 Smart Traffic Prediction System</h1>
+    <p>Enter real-world traffic parameters to predict congestion</p>
+
+    <div class="grid" id="inputs"></div>
+
+    <button onclick="predict()">Predict Traffic</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const labels = [
+      "Vehicle Count",
+      "Average Speed (km/h)",
+      "Road Width (m)",
+      "Signal Timing (sec)",
+      "Pedestrian Count",
+      "Weather Condition (0-1)",
+      "Time of Day (0-24)",
+      "Lane Count",
+      "Accident (0/1)",
+      "Traffic Density",
+      "Public Transport",
+      "Road Condition (0-1)",
+      "Event Impact"
+    ];
+
+    const inputDiv = document.getElementById("inputs");
+
+    labels.forEach((label, i) => {
+      inputDiv.innerHTML += `
+        <div>
+          <label>${label}</label><br>
+          <input type="number" id="i${i}" placeholder="${label}">
+        </div>
+      `;
+    });
+
+    async function predict() {
+      let values = [];
+
+      for (let i = 0; i < 13; i++) {
+        values.push(parseFloat(document.getElementById("i"+i).value) || 0);
+      }
+
+      const res = await fetch("/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({input: values})
+      });
+
+      const data = await res.json();
+
+      document.getElementById("result").innerText =
+        "🚗 Predicted Traffic Level: " + data.prediction;
+    }
+  </script>
+
+</body>
+</html>
